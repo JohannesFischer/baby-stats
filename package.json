@@ -1,0 +1,24 @@
+{
+  "name": "baby-stats",
+  "version": "0.0.1",
+  "description": "as the name says",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohannesFischer/baby-stats.git"
+  },
+  "keywords": [
+    "stats",
+    "baby"
+  ],
+  "author": "me",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JohannesFischer/baby-stats/issues"
+  },
+  "homepage": "https://github.com/JohannesFischer/baby-stats#readme"
+}
