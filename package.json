@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/JohannesFischer/baby-stats/issues"
   },
-  "homepage": "https://github.com/JohannesFischer/baby-stats#readme"
+  "homepage": "https://github.com/JohannesFischer/baby-stats#readme",
+  "dependencies": {
+    "csv": "^2.0.0"
+  }
 }
