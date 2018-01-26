@@ -9,16 +9,9 @@ csvr.read().then(data => {
     const date = moment(time,'DD/MM/YYYY HHmm').format();
 
     // modify duration to be in minutes
-    let dim = duration.replace(/min/, '').replace(/\s+/g, '');
-
-    if (dim.match(/hrs|hr/)) {
-      dim = dim.replace(/hrs|hr/,':');
-    } else {
-      // must add this for mement.js to work
-      dim = '0:'.concat(dim);
-    }
-    const durationInMin = moment.duration(dim).asMinutes();
-
+    const match = duration.match(/((\d+)\shrs?)?\s?((\d+)\smin)?/);
+    const durationString = `${match[2] || '0'}:${match[4] || '00'}`;
+    const durationInMin = moment.duration(durationString).asMinutes();
 
     return {
       date,
