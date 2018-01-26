@@ -1,9 +1,7 @@
 const moment = require('moment');
 const csvr = require('./csv-reader');
 
-csvr.test().then(data => {
-  // console.log(data);
-
+csvr.read().then(data => {
   for (row of data) {
     const [ baby, time, duration, note ] = row;
 

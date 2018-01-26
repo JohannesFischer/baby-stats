@@ -1,14 +1,18 @@
 var fs = require('fs');
 const parse = require('csv-parse');
 
-function test() {
-  console.log('test from csv-reader: it works!');
-
+function read() {
   return new Promise((resolve,reject) => {
     fs.readFile('csv/sleep.csv', 'utf-8', (err, data) => {
-      if (err) throw reject(err);
+      if (err) reject(err);
 
-      parse(data, {auto_parse_date: true}, (err, output) => {
+      const options = {
+        from: 2
+      };
+
+      parse(data, options, (err, output) => {
+        if (err) reject(err);
+
         resolve(output);
       });
     });
@@ -16,5 +20,5 @@ function test() {
 }
 
 module.exports = {
-  test
+  read
 }
