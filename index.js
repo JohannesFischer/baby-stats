@@ -19,7 +19,13 @@ csvr.read().then(data => {
     };
   });
 
-  console.log(babyData);
+  // console.log(babyData);
+
+  // Average Sleep Duration
+  const reducerSum = (accumulator, currentValue) => accumulator + currentValue.durationInMin;
+  const average = babyData.reduce(reducerSum, 0) / babyData.length;
+  const averageDuration = moment.duration(average, 'minutes');
+  console.log(`😴  Average sleep duration is ${averageDuration.hours()}:${averageDuration.minutes()} hours`)
 });
 
 
