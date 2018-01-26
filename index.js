@@ -2,7 +2,7 @@ const moment = require('moment');
 const csvr = require('./csv-reader');
 
 csvr.read().then(data => {
-  for (row of data) {
+  const babyData = data.map(row => {
     const [ baby, time, duration, note ] = row;
 
     // modify date to a proper date object
@@ -10,6 +10,7 @@ csvr.read().then(data => {
 
     // modify duration to be in minutes
     let dim = duration.replace(/min/, '').replace(/\s+/g, '');
+
     if (dim.match(/hrs|hr/)) {
       dim = dim.replace(/hrs|hr/,':');
     } else {
@@ -19,11 +20,13 @@ csvr.read().then(data => {
     const durationInMin = moment.duration(dim).asMinutes();
 
 
+    return {
+      date,
+      durationInMin
+    };
+  });
 
-    console.log(duration);
-    console.log(durationInMin);
-    console.log(date);
-  }
+  console.log(babyData);
 });
 
 
