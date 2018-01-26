@@ -1,4 +1,7 @@
 console.log('it works!');
 
-var csvr = require('./csv-reader');
-csvr.test();
+const csvr = require('./csv-reader');
+
+csvr.test().then(data => {
+  console.log(data);
+});
