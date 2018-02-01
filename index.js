@@ -1,7 +1,10 @@
-const moment = require('moment');
 const csvr = require('./csv-reader');
 const { durationInMinutes, makeDateObject } = require('./util/format');
-const Sleep = require('./db');
+const MongoDB = require('./db/mongodb');
+const Sleep = require('./db/models/sleep');
+
+const db = new MongoDB();
+db.connect();
 
 // csvr.read().then(data => {
 //   const babyData = data.map(row => {
