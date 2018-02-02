@@ -1,7 +1,7 @@
 const csvr = require('./csv-reader');
 const { durationInMinutes, makeDateObject } = require('./util/format');
 const MongoDB = require('./db/mongodb');
-const Sleep = require('./db/models/sleep');
+// const Sleep = require('./db/models/sleep');
 
 MongoDB.connect();
 
@@ -11,6 +11,12 @@ MongoDB.connect();
 // const averageDuration = moment.duration(average, 'minutes');
 // console.log(`😴  Average sleep duration is ${averageDuration.hours()}:${averageDuration.minutes()} hours`)
 
-Sleep.find({}, function(err, docs) {
-  console.log(`Sleep doc count: ${docs.length}`);
+const promises = ['sleep', 'nursing', 'diaper'].map(item => {
+  const model = require('./db/models/' + item);
+  return model.find({}).exec();
+});
+
+Promise.all(promises).then(function(values) {
+  console.log(values);
+  process.exit();
 });

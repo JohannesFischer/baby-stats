@@ -1,41 +1,98 @@
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
 const csvr = require('./csv-reader');
 const { durationInMinutes, makeDateObject } = require('./util/format');
 const MongoDB = require('./db/mongodb');
 
 MongoDB.connect();
 
-const model = require('./db/models/sleep');
-const file = 'csv/sleep.csv';
+const readdirAsync = promisify(fs.readdir);
+const dirname = path.join(__dirname, 'csv');
 
-console.log('Removing documents from collection');
-model.remove({}, function(err) {
-  if (err) {
-    console.log(err);
-    process.exit(1);
+function processData(data, model) {
+  if (model === 'diaper') {
+    return data.map(function(row) {
+      const [ baby, time, status ] = row;
+      const date = makeDateObject(time);
+
+      return {
+        date,
+        status
+      };
+    });
   }
-});
 
-console.log(`Importing data from ${file}...`);
+  if  (model === 'nursing') {
+    return data.map(function(row) {
+      const [ baby, time, startSide, durationLeft, durationRight ] = row;
+      const date = makeDateObject(time);
+      const durationLeftInMin = durationInMinutes(durationLeft);
+      const durationRightInMin = durationInMinutes(durationRight);
 
-csvr.read(file).then(function(data) {
-  const tableData = data.map(function(row) {
-    const [ baby, time, duration, note ] = row;
-    const date = makeDateObject(time);
-    const durationInMin = durationInMinutes(duration);
+      return {
+        date,
+        startSide: startSide.toLowerCase(),
+        durationLeftInMin,
+        durationRightInMin
+      };
+    });
+  }
 
-    return {
-      date,
-      durationInMin
-    };
-  });
+  if (model === 'sleep') {
+    return data.map(function(row) {
+      const [ baby, time, duration ] = row;
+      const date = makeDateObject(time);
+      const durationInMin = durationInMinutes(duration);
 
-  model.insertMany(tableData, function(err, docs) {
-    if (err) {
-      console.log(err);
-      process.exit(1);
-    }
+      return {
+        date,
+        durationInMin
+      };
+    });
+  }
 
-    console.log(`Successfully imported ${docs.length} entries into ${model.modelName}`);
-    process.exit();
-  });
-});
+  return false;
+}
+
+async function importFiles() {
+  try {
+    const files = await readdirAsync(dirname);
+    const csvFiles = files.filter(file => file.endsWith('.csv'));
+    console.log('Importing: ', files.join(', '));
+
+    const promises = files.map(file => {
+      return csvr.read(path.join(dirname, file)).then(function(data) {
+        // TODO: validate name
+        const modelName = file.split('.')[0];
+        const model = require('./db/models/' + modelName);
+
+        console.log(`Importing ${file}...`);
+
+        // Truncate docs
+        model.remove({}, function(err) {
+          if (err) throw new Error(err);
+        });
+
+        return processData(data, modelName);
+
+        // TODO: make this work
+        model.insertMany(tableData, function(err, docs) {
+          if (err) throw new Error(err);
+
+          console.log(`Successfully imported ${docs.length} entries into ${model.modelName}`);
+        });
+      });
+    });
+
+    Promise.all(promises).then(function(values) {
+      console.log(`Imported ${files.length} files as promised.`);
+      process.exit();
+    });
+  }
+  catch (err) {
+    console.log('ERROR:', err);
+  }
+}
+
+importFiles();

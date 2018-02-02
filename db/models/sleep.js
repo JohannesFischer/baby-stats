@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const sleepSchema = mongoose.Schema({
   date: Date,
-  durationInMin: Number
+  duration: Number
 });
 
 const Sleep = mongoose.model('Sleep', sleepSchema);
