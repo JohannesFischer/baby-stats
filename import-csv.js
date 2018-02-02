@@ -2,14 +2,13 @@ const csvr = require('./csv-reader');
 const { durationInMinutes, makeDateObject } = require('./util/format');
 const MongoDB = require('./db/mongodb');
 
-const db = new MongoDB();
-db.connect();
+MongoDB.connect();
 
 const model = require('./db/models/sleep');
 const file = 'csv/sleep.csv';
 
 console.log('Removing documents from collection');
-model.remove({}, (err) => {
+model.remove({}, function(err) {
   if (err) {
     console.log(err);
     process.exit(1);
@@ -18,8 +17,8 @@ model.remove({}, (err) => {
 
 console.log(`Importing data from ${file}...`);
 
-csvr.read(file).then(data => {
-  const tableData = data.map(row => {
+csvr.read(file).then(function(data) {
+  const tableData = data.map(function(row) {
     const [ baby, time, duration, note ] = row;
     const date = makeDateObject(time);
     const durationInMin = durationInMinutes(duration);
@@ -30,7 +29,7 @@ csvr.read(file).then(data => {
     };
   });
 
-  model.insertMany(tableData, (err, docs) => {
+  model.insertMany(tableData, function(err, docs) {
     if (err) {
       console.log(err);
       process.exit(1);
