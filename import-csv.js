@@ -74,7 +74,7 @@ async function importFiles() {
           if (err) throw new Error(err);
         });
 
-        return processData(data, modelName);
+        const tableData = processData(data, modelName);
 
         // TODO: make this work
         model.insertMany(tableData, function(err, docs) {
