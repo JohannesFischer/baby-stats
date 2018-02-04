@@ -17,6 +17,8 @@ const promises = ['sleep', 'nursing', 'diaper'].map(item => {
 });
 
 Promise.all(promises).then(function(values) {
-  console.log(values);
-  process.exit();
+  for (value of values) {
+    console.log(value.length);
+  }
+  // process.exit();
 });

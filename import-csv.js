@@ -74,20 +74,24 @@ async function importFiles() {
           if (err) throw new Error(err);
         });
 
-        const tableData = processData(data, modelName);
+        return {
+          data: processData(data, modelName),
+          model
+        };
+      });
+    });
 
-        // TODO: make this work
-        model.insertMany(tableData, function(err, docs) {
+    Promise.all(promises).then(function(values) {
+      values.forEach(function(item) {
+        const { data, model } = item;
+        model.insertMany(data, function(err, docs) {
           if (err) throw new Error(err);
 
           console.log(`Successfully imported ${docs.length} entries into ${model.modelName}`);
         });
       });
-    });
-
-    Promise.all(promises).then(function(values) {
       console.log(`Imported ${files.length} files as promised.`);
-      process.exit();
+      // process.exit();
     });
   }
   catch (err) {

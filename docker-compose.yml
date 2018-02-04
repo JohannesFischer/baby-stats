@@ -2,7 +2,7 @@ version: "2"
 services:
   baby_stats_app:
     container_name: baby_stats_app
-    restart: always
+    # restart: always
     build: .
     volumes:
       - .:/usr/src/app/
