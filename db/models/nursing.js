@@ -4,8 +4,7 @@ const nursingSchema = mongoose.Schema({
   date: Date,
   startSide: String,
   durationLeft: Number,
-  durationRight: Number,
-  durationTotal: Number
+  durationRight: Number
 });
 
 const Nursing = mongoose.model('Nursing', nursingSchema);
