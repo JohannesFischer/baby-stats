@@ -1,9 +1,11 @@
 const csvr = require('./csv-reader');
 const moment = require('moment');
-const { durationInMinutes, makeDateObject } = require('./util/format');
 const MongoDB = require('./db/mongodb');
+const Diaper = require('./db/models/diaper');
 const Nursing = require('./db/models/nursing');
 const Sleep = require('./db/models/sleep');
+const { durationInMinutes, makeDateObject } = require('./util/format');
+const { reduceCount } = require('./util/results');
 
 MongoDB.connect();
 
@@ -21,6 +23,8 @@ Sleep.aggregate()
   })
   .exec(function(err, res) {
     if (err) return handleError(err);
+
+    if (res.length === 0) return;
 
     const [ group ] = res;
     const durationAverage = moment.duration(group.durationAvg, 'minutes');
@@ -40,9 +44,23 @@ Nursing.aggregate()
   })
   .exec(function(err, res) {
     if (err) return handleError(err);
-    const sum = res.reduce((acc, side) => acc + side.count, 0);
+
+    if (res.length === 0) return;
+
+    const sum = reduceCount(res);
     console.log('🍼  Nursing');
     console.log('Nursed %d times.', sum);
-    console.log(`${res[0]._id} side: ${Math.ceil((100 * res[0].count)/ sum)}%`);
-    console.log(`${res[1]._id} side: ${Math.ceil((100 * res[1].count) / sum)}%`);
+    res.forEach(function(doc) {
+      console.log(`${doc._id} side: ${Math.round((100 * doc.count)/ sum)}%`);
+    });
   });
+
+
+Diaper.groupByStatus(function(res) {
+  const sum = reduceCount(res);
+  console.log('👶 Diaper');
+  console.log('Changed %d times', sum);
+  res.forEach(function(doc) {
+    console.log(`${doc._id} status: ${Math.round((100 * doc.count)/ sum)}%`);
+  });
+});
