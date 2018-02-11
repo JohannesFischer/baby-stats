@@ -9,7 +9,7 @@ function durationInMinutes(duration) {
 
 // Modify date to a proper date object
 function makeDateObject(time) {
-  return moment(time,'DD/MM/YYYY HHmm').format();
+  return moment(time, 'MM/DD/YY HH:mm').format();
 }
 
 module.exports = {
