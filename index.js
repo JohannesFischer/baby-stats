@@ -1,5 +1,6 @@
-const csvr = require('./csv-reader');
 const moment = require('moment');
+const csvr = require('./csv-reader');
+const config = require('./config');
 const MongoDB = require('./db/mongodb');
 const Diaper = require('./db/models/diaper');
 const Nursing = require('./db/models/nursing');
@@ -13,6 +14,10 @@ Sleep.count({}, function (err, count) {
   if (err) console.log(err);
   console.log('there are %d entries.', count);
 });
+
+console.log('👶 Your Baby');
+const birthDay = moment(config.baby.birthDay);
+console.log(`Age now: ${birthDay.toNow()}`);
 
 Sleep.aggregate()
   .group({
@@ -55,10 +60,9 @@ Nursing.aggregate()
     });
   });
 
-
 Diaper.groupByStatus(function(res) {
   const sum = reduceCount(res);
-  console.log('👶 Diaper');
+  console.log('💩 Diaper');
   console.log('Changed %d times', sum);
   res.forEach(function(doc) {
     console.log(`${doc._id} status: ${Math.round((100 * doc.count)/ sum)}%`);
