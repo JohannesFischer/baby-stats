@@ -1,5 +1,7 @@
 module.exports = {
-  // Read these from folder on init?
+  baby: {
+    birthDay: '2018-01-01',
+  },
   models: [
     'diaper',
     'nursing',

@@ -16,8 +16,9 @@ async function importFiles() {
     const files = await readdirAsync(dirname);
     const csvFiles = files.filter(file => file.endsWith('.csv'));
     console.log('Importing files:', files.join(', '));
+    let count = 0;
 
-    files.forEach(file => {
+    csvFiles.forEach(file => {
       return csvr.read(path.join(dirname, file)).then(function(data) {
         const modelName = file.split('.')[0];
 
@@ -38,14 +39,18 @@ async function importFiles() {
 
           model.insertMany(tableData, function(err, docs) {
             if (err) throw new Error(err);
-
+            count++;
             console.log(`Successfully imported ${docs.length} entries into ${model.modelName}`);
+
+            if (count === csvFiles.length) {
+              MongoDB.close();
+              process.exit();
+            }
           });
         })
       });
     });
-  }
-  catch (err) {
+  } catch (err) {
     console.log('ERROR:', err);
   }
 }

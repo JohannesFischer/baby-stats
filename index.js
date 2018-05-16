@@ -1,16 +1,27 @@
-const csvr = require('./csv-reader');
 const moment = require('moment');
-const { durationInMinutes, makeDateObject } = require('./util/format');
+const csvr = require('./csv-reader');
+const config = require('./config');
 const MongoDB = require('./db/mongodb');
+const Diaper = require('./db/models/diaper');
 const Nursing = require('./db/models/nursing');
 const Sleep = require('./db/models/sleep');
+const {
+  capitalize,
+  durationInMinutes,
+  makeDateObject
+} = require('./util/format');
+const { reduceCount } = require('./util/results');
 
 MongoDB.connect();
 
-Sleep.count({}, function (err, count) {
-  if (err) console.log(err);
-  console.log('there are %d entries.', count);
-});
+// Sleep.count({}, function (err, count) {
+//   if (err) console.log(err);
+//   console.log('there are %d entries.', count);
+// });
+
+console.log('👶 Your Baby');
+const birthDay = moment(config.baby.birthDay);
+console.log(`Age now: ${birthDay.toNow()}`);
 
 Sleep.aggregate()
   .group({
@@ -21,6 +32,8 @@ Sleep.aggregate()
   })
   .exec(function(err, res) {
     if (err) return handleError(err);
+
+    if (res.length === 0) return;
 
     const [ group ] = res;
     const durationAverage = moment.duration(group.durationAvg, 'minutes');
@@ -35,14 +48,33 @@ Sleep.aggregate()
 Nursing.aggregate()
   .sort({ startSide: 'desc' })
   .group({
-    _id: '$startSide',
+    _id: null,
+    durationLeft: { $sum: '$durationLeft' },
+    durationRight: { $sum: '$durationRight' },
     count: { $sum: 1 }
   })
   .exec(function(err, res) {
     if (err) return handleError(err);
-    const sum = res.reduce((acc, side) => acc + side.count, 0);
+
+    if (res.length === 0) return;
+
+    const sum = reduceCount(res);
+    const [ group ] = res;
     console.log('🍼  Nursing');
     console.log('Nursed %d times.', sum);
-    console.log(`${res[0]._id} side: ${Math.ceil((100 * res[0].count)/ sum)}%`);
-    console.log(`${res[1]._id} side: ${Math.ceil((100 * res[1].count) / sum)}%`);
+
+    const durationSum = group.durationLeft + group.durationRight;
+    const nursingDuration = moment.duration(durationSum, 'minutes');
+    console.log(`Nursed duration: over ${nursingDuration.hours()} hours`);
+    console.log(`Left side: ${Math.round((100 * group.durationLeft) / durationSum)}%`);
+    console.log(`Right side: ${Math.round((100 * group.durationRight) / durationSum)}%`);
   });
+
+Diaper.groupByStatus(function(res) {
+  const sum = reduceCount(res);
+  console.log('💩 Diaper');
+  console.log('Changed %d times', sum);
+  res.forEach(function(doc) {
+    console.log(`${doc._id} status: ${Math.round((100 * doc.count)/ sum)}%`);
+  });
+});
