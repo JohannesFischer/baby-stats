@@ -1,6 +1,6 @@
 module.exports = {
   baby: {
-    birthDay: '2018-01-07',
+    birthDay: '2018-01-01',
   },
   models: [
     'diaper',
