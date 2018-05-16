@@ -5,15 +5,19 @@ const MongoDB = require('./db/mongodb');
 const Diaper = require('./db/models/diaper');
 const Nursing = require('./db/models/nursing');
 const Sleep = require('./db/models/sleep');
-const { durationInMinutes, makeDateObject } = require('./util/format');
+const {
+  capitalize,
+  durationInMinutes,
+  makeDateObject
+} = require('./util/format');
 const { reduceCount } = require('./util/results');
 
 MongoDB.connect();
 
-Sleep.count({}, function (err, count) {
-  if (err) console.log(err);
-  console.log('there are %d entries.', count);
-});
+// Sleep.count({}, function (err, count) {
+//   if (err) console.log(err);
+//   console.log('there are %d entries.', count);
+// });
 
 console.log('👶 Your Baby');
 const birthDay = moment(config.baby.birthDay);
@@ -44,7 +48,9 @@ Sleep.aggregate()
 Nursing.aggregate()
   .sort({ startSide: 'desc' })
   .group({
-    _id: '$startSide',
+    _id: null,
+    durationLeft: { $sum: '$durationLeft' },
+    durationRight: { $sum: '$durationRight' },
     count: { $sum: 1 }
   })
   .exec(function(err, res) {
@@ -53,11 +59,15 @@ Nursing.aggregate()
     if (res.length === 0) return;
 
     const sum = reduceCount(res);
+    const [ group ] = res;
     console.log('🍼  Nursing');
     console.log('Nursed %d times.', sum);
-    res.forEach(function(doc) {
-      console.log(`${doc._id} side: ${Math.round((100 * doc.count)/ sum)}%`);
-    });
+
+    const durationSum = group.durationLeft + group.durationRight;
+    const nursingDuration = moment.duration(durationSum, 'minutes');
+    console.log(`Nursed duration: over ${nursingDuration.hours()} hours`);
+    console.log(`Left side: ${Math.round((100 * group.durationLeft) / durationSum)}%`);
+    console.log(`Right side: ${Math.round((100 * group.durationRight) / durationSum)}%`);
   });
 
 Diaper.groupByStatus(function(res) {
