@@ -1,5 +1,10 @@
 module.exports = {
-  // Read these from folder on init?
+  baby: {
+    birthDay: '2018-01-01',
+  },
+  csv: {
+    dateformat: 'DD/MM/YY HH:mm'
+  },
   models: [
     'diaper',
     'nursing',

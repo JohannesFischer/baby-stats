@@ -43,14 +43,14 @@ async function importFiles() {
             console.log(`Successfully imported ${docs.length} entries into ${model.modelName}`);
 
             if (count === csvFiles.length) {
+              MongoDB.close();
               process.exit();
             }
           });
         })
       });
     });
-  }
-  catch (err) {
+  } catch (err) {
     console.log('ERROR:', err);
   }
 }
