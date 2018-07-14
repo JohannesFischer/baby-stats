@@ -78,7 +78,7 @@ Diaper.groupByStatus(function(res) {
   const sum = reduceCount(res);
   console.log('💩 Diaper');
   console.log('Changed %d times', sum);
-  console.log(res)
+
   res.forEach(function(doc) {
     const percent = Math.round((100 * doc.count)/ sum);
     if (percent > 0) {

@@ -16,7 +16,7 @@ function durationInMinutes(duration) {
 
 // Modify date to a proper date object
 function makeDateObject(time) {
-  return moment(time, config.csv.dateformat).format();
+  return moment(time, config.csv.dateformat);
 }
 
 function pluralize(str, count) {
@@ -29,10 +29,12 @@ function pluralize(str, count) {
 function humanizeDuration(duration) {
   const months = duration.months();
   const weeks = duration.weeks();
-  const days = duration.days();
+  let days = duration.days();
   const hours = duration.hours();
   const minutes = duration.minutes();
   const seconds = duration.seconds();
+
+  // console.log(duration);
 
   const str = [];
 
@@ -42,6 +44,8 @@ function humanizeDuration(duration) {
   }
 
   if (days > 0) {
+    if (weeks > 0) days -= 7 * weeks;
+
     const dayTitle = pluralize('day', days);
     str.push(`${days} ${dayTitle}`);
   }

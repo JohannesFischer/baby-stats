@@ -5,8 +5,6 @@ function diaper(data) {
     const [ baby, time, status ] = row;
     const date = makeDateObject(time);
 
-    if (date === 'Invalid date') return {};
-
     return {
       date,
       status: status.toLowerCase()
@@ -20,8 +18,6 @@ function nursing(data) {
     const date = makeDateObject(time);
     const durationLeftInMin = durationInMinutes(durationLeft);
     const durationRightInMin = durationInMinutes(durationRight);
-
-    if (date === 'Invalid date') return {};
 
     return {
       date,
@@ -37,8 +33,6 @@ function sleep(data) {
     const [ baby, time, duration ] = row;
     const date = makeDateObject(time);
     const durationInMin = durationInMinutes(duration);
-
-    if (date === 'Invalid date') return {};
 
     return {
       date,

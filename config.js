@@ -3,7 +3,7 @@ module.exports = {
     birthDay: '2018-01-01',
   },
   csv: {
-    dateformat: 'DD/MM/YY HH:mm'
+    dateformat: 'MM/DD/YY HH:mm'
   },
   models: [
     'diaper',
