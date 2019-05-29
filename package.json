@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/JohannesFischer/baby-stats#readme",
   "dependencies": {
-    "csv-parse": "^3.0.0",
+    "csv-parse": "^4.4.3",
     "moment": "^2.22.2",
     "mongoose": "^5.2.3"
   },
